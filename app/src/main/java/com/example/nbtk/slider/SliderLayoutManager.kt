@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearSnapHelper
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 
 
 /**
@@ -12,7 +13,7 @@ import android.support.v7.widget.RecyclerView
 class SliderLayoutManager(context: Context?) : LinearLayoutManager(context) {
 
     init {
-         orientation = HORIZONTAL;
+         orientation = VERTICAL;
     }
 
     var callback: OnItemSelectedListener? = null
@@ -41,22 +42,62 @@ class SliderLayoutManager(context: Context?) : LinearLayoutManager(context) {
         }
     }
 
-    private fun scaleDownView() {
-        val mid = width / 2.0f
-        for (i in 0 until childCount) {
-
-            // Calculating the distance of the child from the center
-            val child = getChildAt(i)
-            val childMid = (getDecoratedLeft(child) + getDecoratedRight(child)) / 2.0f
-            val distanceFromCenter = Math.abs(mid - childMid)
-
-            // The scaling formula
-            val scale = 1-Math.sqrt((distanceFromCenter/width).toDouble()).toFloat()*0.66f
-
-            // Set scale to view
-            child.scaleX = scale
-            child.scaleY = scale
+    override fun scrollVerticallyBy(
+        dy: Int,
+        recycler: RecyclerView.Recycler?,
+        state: RecyclerView.State?
+    ): Int {
+        if (orientation == LinearLayoutManager.VERTICAL) {
+            val scrolled = super.scrollVerticallyBy(dy, recycler, state)
+            scaleDownView()
+            return scrolled
+        } else {
+            return 0
         }
+    }
+
+    private fun scaleDownView() {
+        if(orientation== HORIZONTAL){
+            val mid = width / 2.0f
+            for (i in 0 until childCount) {
+
+                // Calculating the distance of the child from the center
+                val child = getChildAt(i)
+                val childMid = (getDecoratedLeft(child) + getDecoratedRight(child)) / 2.0f
+                val distanceFromCenter = Math.abs(mid - childMid)
+
+                // The scaling formula
+                var scale = 1-distanceFromCenter/width
+
+                // Set scale to view
+                scale = interpolateScale(scale)
+                child.scaleX = scale
+                child.scaleY = scale
+            }
+        }
+        else{
+            val mid = height / 2.0f
+            for (i in 0 until childCount) {
+
+                // Calculating the distance of the child from the center
+                val child = getChildAt(i)
+                val childMid = (getDecoratedTop(child) + getDecoratedBottom(child)) / 2.0f
+                val distanceFromCenter = Math.abs(mid - childMid)
+
+                // The scaling formula
+                var scale = 1-distanceFromCenter/height
+
+                // Set scale to view
+                scale = interpolateScale(scale)
+                child.scaleX = scale
+                child.scaleY = scale
+            }
+        }
+    }
+
+    private fun interpolateScale(scale: Float): Float {
+        Log.d("scale_bug","$scale")
+        return Math.pow(scale.toDouble(),3.0).toFloat()
     }
 
     override fun onScrollStateChanged(state: Int) {
