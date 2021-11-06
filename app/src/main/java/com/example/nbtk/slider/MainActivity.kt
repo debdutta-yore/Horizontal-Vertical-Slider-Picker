@@ -27,13 +27,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun setHorizontalPicker() {
         rvHorizontalPicker = findViewById(R.id.rv_horizontal_picker)
+        val ornt = RecyclerView.HORIZONTAL
 
+        if(ornt==RecyclerView.HORIZONTAL){
+            val padding: Int = ScreenUtils.getScreenWidth(this)/2 - ScreenUtils.dpToPx(this, 40)
+            rvHorizontalPicker.setPadding(padding, 0, padding, 0)
+        }
+        else{
+            val padding: Int = ScreenUtils.getScreenHeight(this)/2 - ScreenUtils.dpToPx(this, 40)
+            rvHorizontalPicker.setPadding(0, padding, 0, padding)
+        }
         // Setting the padding such that the items will appear in the middle of the screen
-        val padding: Int = ScreenUtils.getScreenWidth(this)/2 - ScreenUtils.dpToPx(this, 40)
-        rvHorizontalPicker.setPadding(padding, 0, padding, 0)
+
+
+
 
         // Setting layout manager
-        rvHorizontalPicker.layoutManager = SliderLayoutManager(this).apply {
+        rvHorizontalPicker.layoutManager = SliderLayoutManager(this,ornt).apply {
             callback = object : SliderLayoutManager.OnItemSelectedListener {
                 override fun onItemSelected(layoutPosition: Int) {
                     tvSelectedItem.setText(data[layoutPosition])

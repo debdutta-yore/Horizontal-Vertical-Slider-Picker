@@ -10,10 +10,10 @@ import android.util.Log
 /**
  * Created by nbtk on 5/4/18.
  */
-class SliderLayoutManager(context: Context?) : LinearLayoutManager(context) {
+class SliderLayoutManager(context: Context?,val ornt: Int) : LinearLayoutManager(context) {
 
     init {
-         orientation = VERTICAL;
+         orientation = ornt;
     }
 
     var callback: OnItemSelectedListener? = null
@@ -105,28 +105,51 @@ class SliderLayoutManager(context: Context?) : LinearLayoutManager(context) {
 
         // When scroll stops we notify on the selected item
         if (state.equals(RecyclerView.SCROLL_STATE_IDLE)) {
-
-            // Find the closest child to the recyclerView center --> this is the selected item.
-            val recyclerViewCenterX = getRecyclerViewCenterX()
-            var minDistance = recyclerView.width
-            var position = -1
-            for (i in 0 until recyclerView.childCount) {
-                val child = recyclerView.getChildAt(i)
-                val childCenterX = getDecoratedLeft(child) + (getDecoratedRight(child) - getDecoratedLeft(child)) / 2
-                var newDistance = Math.abs(childCenterX - recyclerViewCenterX)
-                if (newDistance < minDistance) {
-                    minDistance = newDistance
-                    position = recyclerView.getChildLayoutPosition(child)
+            if(orientation== HORIZONTAL){
+                // Find the closest child to the recyclerView center --> this is the selected item.
+                val recyclerViewCenterX = getRecyclerViewCenterX()
+                var minDistance = recyclerView.width
+                var position = -1
+                for (i in 0 until recyclerView.childCount) {
+                    val child = recyclerView.getChildAt(i)
+                    val childCenterX = getDecoratedLeft(child) + (getDecoratedRight(child) - getDecoratedLeft(child)) / 2
+                    var newDistance = Math.abs(childCenterX - recyclerViewCenterX)
+                    if (newDistance < minDistance) {
+                        minDistance = newDistance
+                        position = recyclerView.getChildLayoutPosition(child)
+                    }
                 }
-            }
 
-            // Notify on item selection
-            callback?.onItemSelected(position)
+                // Notify on item selection
+                callback?.onItemSelected(position)
+            }
+            else{
+                // Find the closest child to the recyclerView center --> this is the selected item.
+                val recyclerViewCenterY = getRecyclerViewCenterY()
+                var minDistance = recyclerView.height
+                var position = -1
+                for (i in 0 until recyclerView.childCount) {
+                    val child = recyclerView.getChildAt(i)
+                    val childCenterY = getDecoratedTop(child) + (getDecoratedBottom(child) - getDecoratedTop(child)) / 2
+                    var newDistance = Math.abs(childCenterY - recyclerViewCenterY)
+                    if (newDistance < minDistance) {
+                        minDistance = newDistance
+                        position = recyclerView.getChildLayoutPosition(child)
+                    }
+                }
+
+                // Notify on item selection
+                callback?.onItemSelected(position)
+            }
         }
     }
 
     private fun getRecyclerViewCenterX() : Int {
         return (recyclerView.right - recyclerView.left)/2 + recyclerView.left
+    }
+
+    private fun getRecyclerViewCenterY() : Int {
+        return (recyclerView.bottom - recyclerView.top)/2 + recyclerView.top
     }
 
     interface OnItemSelectedListener {

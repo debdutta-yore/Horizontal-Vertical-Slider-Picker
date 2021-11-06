@@ -18,6 +18,13 @@ class ScreenUtils {
             return dm.widthPixels
         }
 
+        fun getScreenHeight(context: Context): Int {
+            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val dm = DisplayMetrics()
+            windowManager.defaultDisplay.getMetrics(dm)
+            return dm.heightPixels
+        }
+
         fun dpToPx(context: Context, value: Int) : Int {
             return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value.toFloat(), context.resources.displayMetrics).toInt()
         }
